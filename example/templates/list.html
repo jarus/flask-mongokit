@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>All Items</h2>
+<ul>
+	{% for task in tasks %}
+	<li><a href="{{ url_for('show_task', task_id=task._id) }}" >{{ task.title }}</a> - Created: {{ task.creation.strftime('%Y-%m-%d %H:%M') }}</li>
+	{% endfor %}
+</ul>
+<a href="{{ url_for('new_task') }}">Add new Task</a>
+{% endblock %}

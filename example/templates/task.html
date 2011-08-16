@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>Task: {{ task.title }}</h2>
+<strong>Created: {{ task.creation.strftime('%Y-%m-%d %H:%M') }}</strong>
+<p>{{ task.text }}</p>
+{% endblock %}

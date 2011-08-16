@@ -11,6 +11,7 @@ from werkzeug.exceptions import BadRequest
 from bson import ObjectId
 
 class BlogPost(Document):
+    __collection__ = "posts"
     structure = {
         'title': unicode,
         'body': unicode,
@@ -21,13 +22,14 @@ class BlogPost(Document):
     }
     required_fields = ['title', 'author', 'date_creation']
     default_values = {'rank': 0, 'date_creation': datetime.utcnow}
+    use_dot_notation = True 
 
 class TestCase(unittest.TestCase):
     
     def setUp(self):
         self.app = Flask(__name__)
         self.app.config['TESTING'] = True
-        
+        self.app.config['MONGODB_DATABASE'] = 'flask_testing'
         self.db = MongoKit(self.app)
 
         self.ctx = self.app.test_request_context('/')
@@ -43,6 +45,7 @@ class TestCase(unittest.TestCase):
         assert self.db.registered_documents[0] == BlogPost
         
         assert isinstance(self.db, MongoKit)
+        assert self.db.name == self.app.config['MONGODB_DATABASE']
         assert isinstance(self.db.test, Collection)
     
     def test_property_connected(self):
@@ -62,6 +65,24 @@ class TestCase(unittest.TestCase):
                ObjectId("4e4ac5cfffc84958fa1f45fb")
         assert converter.to_url(ObjectId("4e4ac5cfffc84958fa1f45fb")) == \
                "4e4ac5cfffc84958fa1f45fb"
+        
+    def test_save_and_find_document(self):
+        self.db.register([BlogPost])
+        
+        assert len(self.db.registered_documents) > 0
+        assert self.db.registered_documents[0] == BlogPost
+        
+        post = self.db.BlogPost()
+        post.title = u"Flask-MongoKit"
+        post.body = u"Flask-MongoKit is a layer between Flask and MongoKit"
+        post.author = u"Christoph Heer"
+        post.save()
+        
+        assert self.db.BlogPost.find().count() > 0
+        rec_post = self.db.BlogPost.find_one({'title': u"Flask-MongoKit"})
+        assert rec_post.title == post.title
+        assert rec_post.body == rec_post.body
+        assert rec_post.author == rec_post.author
         
         
 if __name__ == '__main__':

@@ -11,8 +11,20 @@
 
 from __future__ import absolute_import
 
+import bson
 from mongokit import Connection, Database, Document, Collection
-from flask import _request_ctx_stack
+from flask import _request_ctx_stack, abort
+from werkzeug.routing import BaseConverter
+
+class BSONObjectIDConverter(BaseConverter):
+    def to_python(self, value):
+        try:
+            return bson.ObjectId(value)
+        except bson.errors.InvalidId, e:
+            raise abort(400)
+        
+    def to_url(self, value):
+        return str(value)
 
 class MongoKit(object):
     
@@ -44,6 +56,8 @@ class MongoKit(object):
         # register extension with app
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongokit'] = self
+        
+        app.url_map.converters['MongoDBObjectID'] = BSONObjectIDConverter
         
         self.app = app
     

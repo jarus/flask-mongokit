@@ -92,6 +92,7 @@ class MongoKit(object):
         ctx = _request_ctx_stack.top
         if self.connected:
             ctx.mongokit_connection.disconnect()
+            del ctx.mongokit_db
         
     def before_request(self):
         if not self.connected:

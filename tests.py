@@ -5,7 +5,10 @@ import unittest
 from datetime import datetime
 
 from flask import Flask
-from flaskext.mongokit import MongoKit, Document, Database, Collection
+from flaskext.mongokit import MongoKit, BSONObjectIDConverter, \
+                              Document, Database, Collection
+from werkzeug.exceptions import BadRequest
+from bson import ObjectId
 
 class BlogPost(Document):
     structure = {
@@ -41,6 +44,25 @@ class TestCase(unittest.TestCase):
         
         assert isinstance(self.db, MongoKit)
         assert isinstance(self.db.test, Collection)
+    
+    def test_property_connected(self):
+        assert not self.db.connected
+
+        self.db.connect()
+        assert self.db.connected
+        
+        self.db.disconnect()
+        assert not self.db.connected
+        
+    def test_bson_object_id_converter(self):
+        converter = BSONObjectIDConverter("/")
+        
+        self.assertRaises(BadRequest, converter.to_python, ("132"))
+        assert converter.to_python("4e4ac5cfffc84958fa1f45fb") == \
+               ObjectId("4e4ac5cfffc84958fa1f45fb")
+        assert converter.to_url(ObjectId("4e4ac5cfffc84958fa1f45fb")) == \
+               "4e4ac5cfffc84958fa1f45fb"
+        
         
 if __name__ == '__main__':
     unittest.main()        

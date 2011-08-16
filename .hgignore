@@ -1,0 +1,9 @@
+syntax: glob
+.DS_Store
+*.pyc
+*.pyo
+env
+env*
+dist
+*.egg
+*.egg-info

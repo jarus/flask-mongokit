@@ -11,7 +11,7 @@
 
 from __future__ import absolute_import
 
-from mongokit import Connection, Database, Document
+from mongokit import Connection, Database, Document, Collection
 from flask import _request_ctx_stack
 
 class MongoKit(object):
@@ -61,25 +61,34 @@ class MongoKit(object):
             slave_okay=self.app.config.get('MONGODB_SLAVE_OKAY')
         )
         ctx.mongokit_connection.register(self.registered_documents)
-        ctx.mongokit_db = Database(ctx.mongokit_connection,     
+        ctx.mongokit_db = Database(ctx.mongokit_connection,
                                    self.app.config.get('MONGODB_DATABASE'))
         if self.app.config.get('MONGODB_USERNAME') is not None:
             ctx.mongokit_db.authenticate(
                 self.app.config.get('MONGODB_USERNAME'),
                 self.app.config.get('MONGODB_PASSWORD')
             )
+   
+    @property
+    def connected(self):
+        ctx = _request_ctx_stack.top
+        return hasattr(ctx, 'mongokit_db')
         
     def disconnect(self):
         ctx = _request_ctx_stack.top
-        ctx.mongokit_connection.disconnect()
+        if self.connected:
+            ctx.mongokit_connection.disconnect()
         
     def before_request(self):
-        return self.connect()
+        if not self.connected:
+            self.connect()
         
     def teardown_request(self, request):
         self.disconnect()
         return request
 
-    def __getattr__(self, *args, **kwargs):
+    def __getattr__(self, func, **kwargs):
+        if not self.connected:
+            self.connect()
         ctx = _request_ctx_stack.top
-        return ctx.mongokit_db.__getattr__(*args, **kwargs)
+        return getattr(ctx.mongokit_db, func)

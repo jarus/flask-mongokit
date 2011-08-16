@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime
 
 from flask import Flask
-from flaskext.mongokit import MongoKit, Document
+from flaskext.mongokit import MongoKit, Document, Database, Collection
 
 class BlogPost(Document):
     structure = {
@@ -25,21 +25,22 @@ class TestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['TESTING'] = True
         
-        self.ctx = self.app.test_request_context()
+        self.db = MongoKit(self.app)
+
+        self.ctx = self.app.test_request_context('/')
         self.ctx.push()
-                
+                    
     def tearDown(self):
         self.ctx.pop()
         
-    def test_initialize(self):
-        db = MongoKit(self.app)
-        db.register([BlogPost])
+    def test_initialization(self):
+        self.db.register([BlogPost])
         
-        assert len(db.registered_documents) > 0
-        assert db.registered_documents[0] == BlogPost
+        assert len(self.db.registered_documents) > 0
+        assert self.db.registered_documents[0] == BlogPost
         
-        db.connect()
-        db.disconnect()
+        assert isinstance(self.db, MongoKit)
+        assert isinstance(self.db.test, Collection)
         
 if __name__ == '__main__':
     unittest.main()        

@@ -35,11 +35,11 @@ class MongoKit(object):
         app.config.setdefault('MONGODB_USERNAME', None)
         app.config.setdefault('MONGODB_PASSWORD', None)
 
-        app.before_request(self.open_connection)
+        app.before_request(self.before_request)
         if hasattr(app, 'teardown_request'):
-            app.teardown_request(self.close_connection)
+            app.teardown_request(self.teardown_request)
         else:
-            app.after_request(self.close_connection)
+            app.after_request(self.teardown_request)
     
         # register extension with app
         app.extensions = getattr(app, 'extensions', {})
@@ -68,15 +68,18 @@ class MongoKit(object):
                 self.app.config.get('MONGODB_USERNAME'),
                 self.app.config.get('MONGODB_PASSWORD')
             )
-        return ctx.mongokit_db
-     
+        
     def disconnect(self):
         ctx = _request_ctx_stack.top
         ctx.mongokit_connection.disconnect()
-       
-    def open_connection(self):
+        
+    def before_request(self):
         return self.connect()
         
-    def close_connection(self, request):
+    def teardown_request(self, request):
         self.disconnect()
         return request
+
+    def __getattr__(self, *args, **kwargs):
+        ctx = _request_ctx_stack.top
+        return ctx.mongokit_db.__getattr__(*args, **kwargs)

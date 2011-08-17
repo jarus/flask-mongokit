@@ -215,9 +215,10 @@ man_pages = [
      [u'Christoph Heer'], 1)
 ]
 
-
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None,
-                       'http://flask.pocoo.org/docs/': None,
-                       'http://api.mongodb.org/python/current/': None,
-                       'http://namlook.github.com/mongokit/': None}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/', None),
+    'flask': ('http://flask.pocoo.org/docs/', None),
+    'mongokit': ('http://namlook.github.com/mongokit/', None),
+    'pymongo': ('http://api.mongodb.org/python/current/', None),
+}

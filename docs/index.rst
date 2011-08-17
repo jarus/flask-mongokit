@@ -3,7 +3,7 @@ Flask-MongoKit
 ==============
 .. currentmodule:: flaskext.mongokit
 
-Flask-MonogKit makes it easy to use `MongoKit`_, a powerful `MongoDB`_ ORM 
+Flask-MongoKit makes it easy to use `MongoKit`_, a powerful `MongoDB`_ ORM 
 in Flask applications. 
 
 .. _MongoKit: http://namlook.github.com/mongokit/
@@ -86,6 +86,32 @@ Now if someone click now on the form button we create a new instance of our mode
 With the find method we get now a list of task which is going to show on the index page.
 
 .. _MongoKit documentation: http://namlook.github.com/mongokit/descriptors.html
+
+Configuration values
+--------------------
+
+The following configuration variables are used in Flask-MongoKit:
+
+.. tabularcolumns:: |p{6.5cm}|p{8.5cm}|
+
+=============================== =========================================
+``MONGODB_DATABASE``            The database name that should used.
+                                
+                                *Default value:* ``flask``
+``MONGODB_HOST``                Hostname or IP address of the MongoDB host
+
+                                *Default value:* ``localhost``
+``MONGODB_PORT``                Listening port of the MongoDB host.
+
+                                *Default value:* ``27017``
+``MONGODB_USERNAME``            If you need authentication than can you set 
+                                your username.
+
+                                *Default value:* ``None``
+``MONGODB_PASSWORD``            Password for authentication.
+
+                                *Default value:* ``None``
+=============================== =========================================
 
     
 API Documentation

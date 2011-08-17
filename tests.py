@@ -84,6 +84,11 @@ class TestCase(unittest.TestCase):
         assert rec_post.body == rec_post.body
         assert rec_post.author == rec_post.author
         
+
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCase))
+    return suite
         
 if __name__ == '__main__':
     unittest.main()        

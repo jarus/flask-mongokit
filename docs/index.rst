@@ -3,7 +3,7 @@ Flask-MongoKit
 ==============
 .. currentmodule:: flaskext.mongokit
 
-Flask-MongoKit makes it easy to use `MongoKit`_, a powerful `MongoDB`_ ORM 
+Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM 
 in Flask applications. If you find bugs or want to support this extension you can find the source code `here`_.
 
 .. _MongoKit: http://namlook.github.com/mongokit/
@@ -12,13 +12,13 @@ in Flask applications. If you find bugs or want to support this extension you ca
 
 Installation
 ============
-The installation is thanks the Python Package Index and `pip`_ really simple.
+The installation is thanks to the Python Package Index and `pip`_ really simple.
 
 .. code-block:: console
 
    $ pip install Flask-MongoKit
 
-If you can only use `easy_install` than use
+If you only can use `easy_install` than use
 
 .. code-block:: console
 
@@ -26,7 +26,7 @@ If you can only use `easy_install` than use
 
 .. _pip: http://pip.openplans.org/
 
-Flask-MongoKit requires to run some packages (they will be installed automated if they not already installed):
+Flask-MongoKit requires to run some packages (they will be installed automatically if they not already installed):
 
 * Flask
 * MongoKit
@@ -34,7 +34,7 @@ Flask-MongoKit requires to run some packages (they will be installed automated i
 
 Your first Document
 ===================
-It is very simple to use MongoKit in your Flask application. Lets create a simple ToDo application.
+It is very simple to use MongoKit in your Flask application. Let's create a simple ToDo application.
 
 .. code-block:: python
 
@@ -59,7 +59,7 @@ It is very simple to use MongoKit in your Flask application. Lets create a simpl
     db = MongoKit(app)
     db.register([Task])
 
-You can see we create your document model as class *Task* which use Document from flaskext.mongokit as parent class. In this model we describe the structure of our document and can set a list of required fields and default values. The :class:`flaskext.mongokit.Document` is the same like :class:`mongokit.Document` so if you want to know more about the features of the Document class please look into the `MongoKit documentation`_. That you can use the document model we must register it with the connection like normal by MongoKit so we use the :meth:`~flaskext.mongokit.MongoKit.register`.
+As you can see we create a document model as class *Task* which uses Document from flaskext.mongokit as parent class. In this model we describe the structure of our document and we can set a list of required fields and default values. The :class:`flaskext.mongokit.Document` is the same like :class:`mongokit.Document` so if you want to know more about the features of the Document class please look into the `MongoKit documentation`_. For using the the document model we must register it with the connection. But we use the :meth:`~flaskext.mongokit.MongoKit.register` method from the :class:`flaskext.mongokit.MongoKit` class.
 
 Now we need a view to add a new task like this.
 
@@ -75,9 +75,9 @@ Now we need a view to add a new task like this.
             return redirect(url_for('show_all'))
         return render_template('new.html')
 
-If someone now clicking on the submit button of the form your application will create a new instance of your Task model class. In the following we set title and text of the task and save it into your MongoDB.
+If someone now clicks on the submit button of the form your application will create a new instance of your Task model class. After that we set title and text of the task and save it into your MongoDB.
 
-But now we want to get a list of task, so we add a other view.
+But now we want to get a list of task, so we add an other view.
 
 .. code-block:: python
 
@@ -86,9 +86,9 @@ But now we want to get a list of task, so we add a other view.
         tasks = db.Task.find()
         return render_template('list.html', tasks=tasks)
 
-This view is very simple you can see we only call the :meth:`find` method and put the result into our template. Now we have a running example to work simple with a MongoDB inside a Flask application.
+This view is very simple. You can see we only call the :meth:`find` method and put the result into our template. Now we have a running example that works simple with a MongoDB inside a Flask application.
 
-If you want to see a full example of Flask-MongoKit look inside the repository you are going to find this todo application with the matching templates.
+If you want to see a full example of Flask-MongoKit look inside the repository. You will find there this ToDo application with the matching templates.
 
 .. _MongoKit documentation: http://namlook.github.com/mongokit/descriptors.html
 
@@ -103,14 +103,14 @@ The following configuration variables are used in Flask-MongoKit:
 ``MONGODB_DATABASE``            The database name that should used.
                                 
                                 *Default value:* ``flask``
-``MONGODB_HOST``                Hostname or IP address of the MongoDB host
+``MONGODB_HOST``                Hostname or IP address of the MongoDB host.
 
                                 *Default value:* ``localhost``
 ``MONGODB_PORT``                Listening port of the MongoDB host.
 
                                 *Default value:* ``27017``
-``MONGODB_USERNAME``            If you need authentication than can you set 
-                                your username.
+``MONGODB_USERNAME``            If you need authentication than you can set             
+                                there your username.
 
                                 *Default value:* ``None``
 ``MONGODB_PASSWORD``            Password for authentication.

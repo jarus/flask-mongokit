@@ -3,8 +3,9 @@
     flaskext.mongokit
     ~~~~~~~~~~~~~~~~~
 
-    Make the integration of :mod:`mongokit` simpler into :mod:`Flask`.
-    
+    Flask-MongoKit simplifies to use MongoKit, a powerful MongoDB ORM in Flask      
+    applications. 
+       
     :copyright: 2011 by Christoph Heer <Christoph.Heer@googlemail.com
     :license: BSD, see LICENSE for more details.
 """
@@ -17,7 +18,7 @@ from flask import _request_ctx_stack, abort
 from werkzeug.routing import BaseConverter
 
 class BSONObjectIdConverter(BaseConverter):
-    """A simple converter for the RESTfull url routing system of flask.
+    """A simple converter for the RESTfull URL routing system of Flask.
     
     .. code-block:: python
         
@@ -26,11 +27,12 @@ class BSONObjectIdConverter(BaseConverter):
             task = db.Task.get_from_id(task_id)
             return render_template('task.html', task=task)
     
-    It checks the validate of the id and convert it into a
-    :class:`bson.objectid.ObjectId` object. The converter will be automated         
-    register by the initialization of :class:`~flaskext.mongokit.MongoKit`
-    with keyword :attr:`ObjectId`.
+    It checks the validate of the id and converts it into a
+    :class:`bson.objectid.ObjectId` object. The converter will be
+    automatically registered by the initialization of
+    :class:`~flaskext.mongokit.MongoKit` with keyword :attr:`ObjectId`.
     """
+    
     def to_python(self, value):
         try:
             return bson.ObjectId(value)
@@ -41,11 +43,11 @@ class BSONObjectIdConverter(BaseConverter):
         return str(value)
 
 class MongoKit(object):
-    """Simple helper class to integrate `MongoKit`_ into a Flask application.
-    
-    :param app: The Flask application to which this MongoKit should be bound.
-                If an app is not provided at initialization time, it must be
-                provided later by calling :meth:`init_app` manually.
+    """This class is used to integrate `MongoKit`_ into a Flask application.
+
+    :param app: The Flask application will be bound to this MongoKit instance.
+                If an app is not provided at initialization time than it 
+                must be provided later by calling :meth:`init_app` manually.
     
     .. _MongoKit: http://namlook.github.com/mongokit/
     """
@@ -62,13 +64,17 @@ class MongoKit(object):
             self.app = None
 
     def init_app(self, app):
-        """Bind an app to a MongoKit instance and register functions as     
-        :meth:`~flask.Flask.before_request` and 
+        """This method sets up some :meth:`~flask.Flask.before_request` and 
         :meth:`~flask.Flask.after_request` or 
-        :meth:`~flask.Flask.teardown_request`.
+        :meth:`~flask.Flask.teardown_request` handlers to support that
+        MongoKit opens a connection to your MongoDB host on a request and   
+        closes after the response.
         
-        :param app: The application to which the MongoKit instance should be
-                    bound.
+        Also it registers the :class:`flaskext.mongokit.BSONObjectIdConverter`
+        as a converter with the key word **ObjectId**.
+        
+        :param app: The Flask application will be bound to this MongoKit 
+                    instance.
         """
         app.config.setdefault('MONGODB_HOST', '127.0.0.1')
         app.config.setdefault('MONGODB_PORT', 27017)
@@ -92,9 +98,10 @@ class MongoKit(object):
         self.app = app
     
     def register(self, documents):
-        """Register a :class:`mongokit.Document` to the connection.
+        """Register one or more :class:`mongokit.Document` instances to the 
+        connection.
         
-        :param documents: A :class:`list` of :class:`mongokit.Document`
+        :param documents: A :class:`list` of :class:`mongokit.Document`.
         """
         for document in documents:
             if document not in self.registered_documents:
@@ -104,7 +111,7 @@ class MongoKit(object):
     def connect(self):
         """Connect to the MongoDB server and register the documents from
         :attr:`registered_documents`. If you set ``MONGODB_USERNAME`` and
-        ``MONGODB_PASSWORD`` they will you authenticate at the
+        ``MONGODB_PASSWORD`` then you will be authenticated at the
         ``MONGODB_DATABASE``.
         """
         ctx = _request_ctx_stack.top
@@ -124,14 +131,12 @@ class MongoKit(object):
    
     @property
     def connected(self):
-        """Connection status of the MongoDB.
-        """
+        """Connection status to your MongoDB."""
         ctx = _request_ctx_stack.top
         return hasattr(ctx, 'mongokit_db')
         
     def disconnect(self):
-        """Close the connection to the MongoDB.
-        """
+        """Close the connection to your MongoDB."""
         ctx = _request_ctx_stack.top
         if self.connected:
             ctx.mongokit_connection.disconnect()

@@ -7,3 +7,4 @@ env*
 dist
 *.egg
 *.egg-info
+_build

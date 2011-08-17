@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime
 
 from flask import Flask
-from flaskext.mongokit import MongoKit, BSONObjectIDConverter, \
+from flaskext.mongokit import MongoKit, BSONObjectIdConverter, \
                               Document, Database, Collection
 from werkzeug.exceptions import BadRequest
 from bson import ObjectId
@@ -58,7 +58,7 @@ class TestCase(unittest.TestCase):
         assert not self.db.connected
         
     def test_bson_object_id_converter(self):
-        converter = BSONObjectIDConverter("/")
+        converter = BSONObjectIdConverter("/")
         
         self.assertRaises(BadRequest, converter.to_python, ("132"))
         assert converter.to_python("4e4ac5cfffc84958fa1f45fb") == \

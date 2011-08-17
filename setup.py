@@ -2,7 +2,15 @@
 Flask-MongoKit
 --------------
 
-Flask-MongoKit make it simpler to integrate the MongoDB ODM into Flask.
+Flask-MongoKit makes it easy to use MongoKit, a powerful MongoDB ORM in Flask applications.
+
+Links
+`````
+
+* `documentation <http://packages.python.org/Flask-MongoKit>`_
+* `sourcecode <http://bitbucket.org/Jarus/flask-mongokit/>`_
+* `MongoKit <http://namlook.github.com/mongokit/>`_
+* `Flask <http://flask.pocoo.org>`_
 
 """
 from setuptools import setup

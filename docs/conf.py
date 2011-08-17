@@ -221,4 +221,5 @@ intersphinx_mapping = {
     'flask': ('http://flask.pocoo.org/docs/', None),
     'mongokit': ('http://namlook.github.com/mongokit/', None),
     'pymongo': ('http://api.mongodb.org/python/current/', None),
+    'bson': ('http://api.mongodb.org/python/current/', None),
 }

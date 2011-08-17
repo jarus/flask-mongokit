@@ -16,7 +16,21 @@ from mongokit import Connection, Database, Document, Collection
 from flask import _request_ctx_stack, abort
 from werkzeug.routing import BaseConverter
 
-class BSONObjectIDConverter(BaseConverter):
+class BSONObjectIdConverter(BaseConverter):
+    """A simple converter for the RESTfull url routing system of flask.
+    
+    .. code-block:: python
+        
+        @app.route('/<ObjectId:task_id>')
+        def show_task(task_id):
+            task = db.Task.get_from_id(task_id)
+            return render_template('task.html', task=task)
+    
+    It checks the validate of the id and convert it into a
+    :class:`bson.objectid.ObjectId` object. The converter will be automated         
+    register by the initialization of :class:`~flaskext.mongokit.MongoKit`
+    with keyword :attr:`ObjectId`.
+    """
     def to_python(self, value):
         try:
             return bson.ObjectId(value)
@@ -73,7 +87,7 @@ class MongoKit(object):
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mongokit'] = self
         
-        app.url_map.converters['MongoDBObjectID'] = BSONObjectIDConverter
+        app.url_map.converters['ObjectId'] = BSONObjectIdConverter
         
         self.app = app
     

@@ -24,7 +24,7 @@ def show_all():
     tasks = db.Task.find()
     return render_template('list.html', tasks=tasks)
 
-@app.route('/<MongoDBObjectID:task_id>')
+@app.route('/<ObjectId:task_id>')
 def show_task(task_id):
     task = db.Task.get_from_id(task_id)
     return render_template('task.html', task=task)

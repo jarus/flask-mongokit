@@ -33,7 +33,7 @@ Flask-MongoKit requires to run some packages (they will be installed automated i
 
 Your first Document
 ===================
-It is very simple and fast to use MongoKit in your Flask application. Lets create a simple ToDo application
+It is very simple to use MongoKit in your Flask application. Lets create a simple ToDo application.
 
 .. code-block:: python
 
@@ -58,9 +58,9 @@ It is very simple and fast to use MongoKit in your Flask application. Lets creat
     db = MongoKit(app)
     db.register([Task])
 
-You can see we create a model (class Task) for our document and definied a structur, a list of required fields and default values. Also we say that we want to use a dot notation. To learn more about the definition of a Document look into the `MongoKit documentation`_.
+You can see we create your document model as class *Task* which use Document from flaskext.mongokit as parent class. In this model we describe the structure of our document and can set a list of required fields and default values. The :class:`flaskext.mongokit.Document` is the same like :class:`mongokit.Document` so if you want to know more about the features of the Document class please look into the `MongoKit documentation`_. That you can use the document model we must register it with the connection like normal by MongoKit so we use the :meth:`~flaskext.mongokit.MongoKit.register`.
 
-Now we want that we can add a task over a form into our database.
+Now we need a view to add a new task like this.
 
 .. code-block:: python
     
@@ -73,8 +73,10 @@ Now we want that we can add a task over a form into our database.
             task.save()
             return redirect(url_for('show_all'))
         return render_template('new.html')
-    
-Now if someone click now on the form button we create a new instance of our model Task and set in the next two lines title and text. After that we save the object into your database and redirect the visitor to the list of all task.
+
+If someone now clicking on the submit button of the form your application will create a new instance of your Task model class. In the following we set title and text of the task and save it into your MongoDB.
+
+But now we want to get a list of task, so we add a other view.
 
 .. code-block:: python
 
@@ -83,7 +85,9 @@ Now if someone click now on the form button we create a new instance of our mode
         tasks = db.Task.find()
         return render_template('list.html', tasks=tasks)
 
-With the find method we get now a list of task which is going to show on the index page.
+This view is very simple you can see we only call the :meth:`find` method and put the result into our template. Now we have a running example to work simple with a MongoDB inside a Flask application.
+
+If you want to see a full example of Flask-MongoKit look inside the repository you are going to find this todo application with the matching templates.
 
 .. _MongoKit documentation: http://namlook.github.com/mongokit/descriptors.html
 
@@ -118,4 +122,8 @@ API Documentation
 =================
 
 .. autoclass:: MongoKit
+    :members:
+
+
+.. autoclass:: BSONObjectIdConverter
     :members:

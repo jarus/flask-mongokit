@@ -53,7 +53,7 @@ It is very simple to use MongoKit in your Flask application. Let's create a simp
             'creation': datetime,
         }
         required_fields = ['title', 'creation']
-        default_values = {'creation': datetime.utcnow()}
+        default_values = {'creation': datetime.utcnow}
         use_dot_notation = True 
 
     db = MongoKit(app)

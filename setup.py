@@ -9,7 +9,7 @@ Links
 `````
 
 * `documentation <http://packages.python.org/Flask-MongoKit>`_
-* `sourcecode <http://bitbucket.org/Jarus/flask-mongokit/>`_
+* `development version <http://github.com/jarus/flask-mongokit/zipball/master#egg=Flask-MongoKit-dev>`_
 * `MongoKit <http://namlook.github.com/mongokit/>`_
 * `Flask <http://flask.pocoo.org>`_
 
@@ -20,7 +20,7 @@ from setuptools import setup
 setup(
     name='Flask-MongoKit',
     version='0.2',
-    url='http://bitbucket.org/Jarus/flask-mongokit',
+    url='http://github.com/jarus/flask-mongokit',
     license='BSD',
     author='Christoph Heer',
     author_email='Christoph.Heer@googlemail.com',

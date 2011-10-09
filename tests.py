@@ -104,6 +104,27 @@ class TestCase(unittest.TestCase):
             self.fail("There should be a document with this id")
         self.assertRaises(NotFound, self.db.BlogPost.get_or_404, ObjectId())
 
+    def test_find_one_or_404(self):
+        self.db.register([BlogPost])
+        
+        assert len(self.db.registered_documents) > 0
+        assert self.db.registered_documents[0] == BlogPost
+        
+        post = self.db.BlogPost()
+        post.title = u"Flask-MongoKit"
+        post.body = u"Flask-MongoKit is a layer between Flask and MongoKit"
+        post.author = u"Christoph Heer"
+        post.save()
+
+        assert self.db.BlogPost.find().count() > 0
+        assert "find_one_or_404" in dir(self.db.BlogPost)
+        try:
+            self.db.BlogPost.find_one_or_404({'title': u'Flask-MongoKit'})
+        except NotFound:
+            self.fail("There should be a document with this title")
+        self.assertRaises(NotFound, self.db.BlogPost.find_one_or_404, 
+                          {'title': u'Flask is great'})
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestCase))

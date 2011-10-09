@@ -56,6 +56,18 @@ class Document(Document):
         else:
             return doc
 
+    def find_one_or_404(self, *args, **kwargs):
+        """This method get one document over normal query parameter like 
+        :meth:`~flaskext.mongokit.Document.find_one` but if there no document
+        then it will raise a 404 error.
+        """
+        
+        doc = self.find_one(*args, **kwargs)
+        if doc is None:
+            abort(404)
+        else:
+            return doc
+
 class MongoKit(object):
     """This class is used to integrate `MongoKit`_ into a Flask application.
 

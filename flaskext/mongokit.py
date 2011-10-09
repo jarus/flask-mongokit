@@ -44,11 +44,11 @@ class BSONObjectIdConverter(BaseConverter):
 
 class Document(Document):
     def get_or_404(self, id):
-        """This method get one document over the _id. If there no document
-        with this id then it will raised a 404 error.
+        """This method get one document over the _id field. If there no 
+        document with this id then it will raised a 404 error.
         
         :param id: The id from the document. The most time there will be 
-                   a ObjectId.
+                   an :class:`bson.objectid.ObjectId`.
         """
         doc = self.get_from_id(id)
         if doc is None:

@@ -59,7 +59,7 @@ It is very simple to use MongoKit in your Flask application. Let's create a simp
     db = MongoKit(app)
     db.register([Task])
 
-As you can see we create a document model as class *Task* which uses Document from flaskext.mongokit as parent class. In this model we describe the structure of our document and we can set a list of required fields and default values. The :class:`flaskext.mongokit.Document` is the same like :class:`mongokit.Document` so if you want to know more about the features of the Document class please look into the `MongoKit documentation`_. For using the the document model we must register it with the connection. But we use the :meth:`~flaskext.mongokit.MongoKit.register` method from the :class:`flaskext.mongokit.MongoKit` class.
+As you can see we create a document model as class *Task* which uses Document from flaskext.mongokit as parent class. In this model we describe the structure of our document and we can set a list of required fields and default values. The :class:`flaskext.mongokit.Document` is beside some extensions the same like :class:`mongokit.Document` so if you want to know more about the core features of the Document class please look into the `MongoKit documentation`_. For using the the document model we must register it with the connection. But we use the :meth:`~flaskext.mongokit.MongoKit.register` method from the :class:`flaskext.mongokit.MongoKit` class.
 
 Now we need a view to add a new task like this.
 
@@ -125,6 +125,8 @@ API Documentation
 .. autoclass:: MongoKit
     :members:
 
+.. autoclass:: Document
+    :members:
 
 .. autoclass:: BSONObjectIdConverter
     :members:

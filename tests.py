@@ -6,8 +6,8 @@ from datetime import datetime
 
 from flask import Flask
 from flaskext.mongokit import MongoKit, BSONObjectIdConverter, \
-                              Document, Database, Collection
-from werkzeug.exceptions import BadRequest
+                              Document, Collection
+from werkzeug.exceptions import BadRequest, NotFound
 from bson import ObjectId
 
 class BlogPost(Document):
@@ -84,6 +84,25 @@ class TestCase(unittest.TestCase):
         assert rec_post.body == rec_post.body
         assert rec_post.author == rec_post.author
         
+    def test_get_or_404(self):
+        self.db.register([BlogPost])
+        
+        assert len(self.db.registered_documents) > 0
+        assert self.db.registered_documents[0] == BlogPost
+        
+        post = self.db.BlogPost()
+        post.title = u"Flask-MongoKit"
+        post.body = u"Flask-MongoKit is a layer between Flask and MongoKit"
+        post.author = u"Christoph Heer"
+        post.save()
+
+        assert self.db.BlogPost.find().count() > 0
+        assert "get_or_404" in dir(self.db.BlogPost)
+        try:
+            self.db.BlogPost.get_or_404(post['_id'])
+        except NotFound:
+            self.fail("There should be a document with this id")
+        self.assertRaises(NotFound, self.db.BlogPost.get_or_404, ObjectId())
 
 def suite():
     suite = unittest.TestSuite()

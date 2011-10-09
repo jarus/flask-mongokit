@@ -36,11 +36,25 @@ class BSONObjectIdConverter(BaseConverter):
     def to_python(self, value):
         try:
             return bson.ObjectId(value)
-        except bson.errors.InvalidId, e:
+        except bson.errors.InvalidId:
             raise abort(400)
         
     def to_url(self, value):
         return str(value)
+
+class Document(Document):
+    def get_or_404(self, id):
+        """This method get one document over the _id. If there no document
+        with this id then it will raised a 404 error.
+        
+        :param id: The id from the document. The most time there will be 
+                   a ObjectId.
+        """
+        doc = self.get_from_id(id)
+        if doc is None:
+            abort(404)
+        else:
+            return doc
 
 class MongoKit(object):
     """This class is used to integrate `MongoKit`_ into a Flask application.

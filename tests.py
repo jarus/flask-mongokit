@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import os
 
 from datetime import datetime
 
@@ -30,6 +31,8 @@ class TestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['TESTING'] = True
         self.app.config['MONGODB_DATABASE'] = 'flask_testing'
+        self.app.config.from_pyfile(os.path.join(os.getcwd(), 
+            "config_test.cfg"), silent=True)
         self.db = MongoKit(self.app)
 
         self.ctx = self.app.test_request_context('/')

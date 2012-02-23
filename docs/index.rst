@@ -41,7 +41,7 @@ It is very simple to use MongoKit in your Flask application. Let's create a simp
     from datetime import datetime
 
     from flask import Flask, request, render_template, redirect, url_for
-    from flaskext.mongokit import MongoKit, Document
+    from flask.ext.mongokit import MongoKit, Document
 
     app = Flask(__name__)
 

@@ -19,16 +19,16 @@ from setuptools import setup
 
 setup(
     name='Flask-MongoKit',
-    version='0.3',
+    version='0.4',
     url='http://github.com/jarus/flask-mongokit',
     license='BSD',
     author='Christoph Heer',
     author_email='Christoph.Heer@googlemail.com',
     description='A Flask extension simplifies to use MongoKit',
     long_description=__doc__,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    py_modules=['flask_mongokit'],
     zip_safe=False,
+    include_package_data=True,
     platforms='any',
     install_requires=[
         'Flask',

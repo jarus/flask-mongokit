@@ -6,8 +6,8 @@ import os
 from datetime import datetime
 
 from flask import Flask
-from flaskext.mongokit import MongoKit, BSONObjectIdConverter, \
-                              Document, Collection
+from flask.ext.mongokit import MongoKit, BSONObjectIdConverter, \
+                               Document, Collection
 from werkzeug.exceptions import BadRequest, NotFound
 from bson import ObjectId
 

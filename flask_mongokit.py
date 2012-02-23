@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    flaskext.mongokit
-    ~~~~~~~~~~~~~~~~~
+    flask.ext.mongokit
+    ~~~~~~~~~~~~~~~~~~
 
     Flask-MongoKit simplifies to use MongoKit, a powerful MongoDB ORM in Flask      
     applications. 
@@ -30,7 +30,7 @@ class BSONObjectIdConverter(BaseConverter):
     It checks the validate of the id and converts it into a
     :class:`bson.objectid.ObjectId` object. The converter will be
     automatically registered by the initialization of
-    :class:`~flaskext.mongokit.MongoKit` with keyword :attr:`ObjectId`.
+    :class:`~flask.ext.mongokit.MongoKit` with keyword :attr:`ObjectId`.
     """
     
     def to_python(self, value):
@@ -58,7 +58,7 @@ class Document(Document):
 
     def find_one_or_404(self, *args, **kwargs):
         """This method get one document over normal query parameter like 
-        :meth:`~flaskext.mongokit.Document.find_one` but if there no document
+        :meth:`~flask.ext.mongokit.Document.find_one` but if there no document
         then it will raise a 404 error.
         """
         
@@ -96,7 +96,8 @@ class MongoKit(object):
         MongoKit opens a connection to your MongoDB host on a request and   
         closes after the response.
         
-        Also it registers the :class:`flaskext.mongokit.BSONObjectIdConverter`
+        Also it registers the 
+        :class:`flask.ext.mongokit.BSONObjectIdConverter`
         as a converter with the key word **ObjectId**.
         
         :param app: The Flask application will be bound to this MongoKit 

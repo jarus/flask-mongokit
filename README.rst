@@ -2,7 +2,7 @@ Flask-MongoKit
 ==============
 
 Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM 
-in Flask applications. If you find bugs or want to support this extension you can find the source code `here`_.
+in Flask applications.
 
 .. _MongoKit: http://namlook.github.com/mongokit/
 .. _MongoDB: http://www.mongodb.org/
@@ -30,3 +30,11 @@ Flask-MongoKit requires to run some packages (they will be installed automatical
 * MongoKit
 * pymongo
 
+Changes
+-------
+
+* **0.4**: Support new import system of flask. Use now:
+
+::
+   
+   form flask.ext.mongokit import Mongokit

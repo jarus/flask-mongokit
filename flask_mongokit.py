@@ -128,12 +128,40 @@ class MongoKit(object):
         """Register one or more :class:`mongokit.Document` instances to the 
         connection.
         
+        Can be also used as a decorator on documents:
+
+        .. code-block:: python
+        
+            db = MongoKit(app)
+
+            @db.register
+            class Task(Document):
+                structure = {
+                   'title': unicode,
+                   'text': unicode,
+                   'creation': datetime,
+                }
+
         :param documents: A :class:`list` of :class:`mongokit.Document`.
         """
+
+        #enable decorator usage as in mongokit.Connection
+        decorator = None
+        if not isinstance(documents, (list, tuple, set, frozenset)):
+            # we assume that the user used this as a decorator
+            # using @register syntax or using db.register(SomeDoc)
+            # we stock the class object in order to return it later
+            decorator = documents
+            documents = [documents]
+
         for document in documents:
             if document not in self.registered_documents:
                 self.registered_documents.append(document)
-        return self.registered_documents
+
+        if decorator is None:
+            return self.registered_documents
+        else:
+            return decorator
     
     def connect(self):
         """Connect to the MongoDB server and register the documents from
@@ -161,7 +189,7 @@ class MongoKit(object):
         """Connection status to your MongoDB."""
         ctx = _request_ctx_stack.top
         return hasattr(ctx, 'mongokit_db')
-        
+       
     def disconnect(self):
         """Close the connection to your MongoDB."""
         ctx = _request_ctx_stack.top

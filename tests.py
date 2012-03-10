@@ -50,6 +50,15 @@ class TestCase(unittest.TestCase):
         assert isinstance(self.db, MongoKit)
         assert self.db.name == self.app.config['MONGODB_DATABASE']
         assert isinstance(self.db.test, Collection)
+
+    def test_decorator_registration(self):
+        
+        @self.db.register
+        class DecoratorRegistered(Document):
+            pass
+
+        assert len(self.db.registered_documents) > 0
+        assert self.db.registered_documents[0] == DecoratorRegistered
     
     def test_property_connected(self):
         assert not self.db.connected

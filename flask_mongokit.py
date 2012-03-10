@@ -190,13 +190,6 @@ class MongoKit(object):
         ctx = _request_ctx_stack.top
         return hasattr(ctx, 'mongokit_db')
        
-    @property
-    def mongokit_db(self):
-        if self.connected:
-            return _request_ctx_stack.top.mongokit_db
-
-        return None
-
     def disconnect(self):
         """Close the connection to your MongoDB."""
         ctx = _request_ctx_stack.top

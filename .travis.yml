@@ -1,10 +1,13 @@
 language: python
 python:
-  - "2.5"
   - "2.6"
   - "2.7"
+env:
+  - FLASK=dev
+  - FLASK=0.8
+  - FLASK=0.7
 install:
-  - pip install flask --use-mirrors
+  - pip install flask==$FLASK --use-mirrors
   - pip install -e . --use-mirrors
 script:
   - python setup.py test

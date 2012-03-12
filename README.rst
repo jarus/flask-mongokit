@@ -1,6 +1,9 @@
 Flask-MongoKit
 ==============
 
+.. image:: https://secure.travis-ci.org/jarus/flask-mongokit.png
+   :target: http://travis-ci.org/jarus/flask-mongokit
+
 Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM 
 in Flask applications.
 

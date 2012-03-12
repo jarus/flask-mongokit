@@ -1,0 +1,13 @@
+language: python
+python:
+  - "2.5"
+  - "2.6"
+  - "2.7"
+install:
+  - pip install flask --use-mirrors
+  - pip install -e . --use-mirrors
+script:
+  - python setup.py test
+notifications:
+  email:
+    - christoph.heer@googlemail.com

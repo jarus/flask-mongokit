@@ -13,12 +13,12 @@
 from __future__ import absolute_import
 
 import bson
-from mongokit import Connection, Database, Document
+from mongokit import Connection, Database, Collection, Document
 from flask import abort
 from werkzeug.routing import BaseConverter
 
 
-1class BSONObjectIdConverter(BaseConverter):
+class BSONObjectIdConverter(BaseConverter):
     """A simple converter for the RESTfull URL routing system of Flask.
 
     .. code-block:: python
@@ -205,7 +205,10 @@ class MongoKit(object):
         self.disconnect()
         return request
 
-    def __getattr__(self, func, **kwargs):
-        if not self.connected:
-            self.connect()
-        return getattr(self.mongokit_db, func)
+    def __getattr__(self, name, **kwargs):
+        if name == 'mongokit_db':
+            return self.mongokit_db
+        else:
+            if not self.connected:
+                self.connect()
+            return getattr(self.mongokit_db, name)

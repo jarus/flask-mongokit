@@ -115,8 +115,14 @@ class MongoKit(object):
         app.config.setdefault('MONGODB_PASSWORD', None)
 
         app.before_request(self.before_request)
-        if hasattr(app, 'teardown_request'):
+
+        # 0.9 and later
+        if hasattr(app, 'teardown_appcontext'):
+            app.teardown_appcontext(self.teardown_request)
+        # 0.7 to 0.8
+        elif hasattr(app, 'teardown_request'):
             app.teardown_request(self.teardown_request)
+        # Older Flask versions
         else:
             app.after_request(self.teardown_request)
 

@@ -85,6 +85,7 @@ class MongoKit(object):
         #: :class:`list` of :class:`mongokit.Document`
         #: which will be automated registed at connection
         self.registered_documents = []
+        self.mongokit_connection = None
 
         if app is not None:
             self.app = app
@@ -189,12 +190,13 @@ class MongoKit(object):
     @property
     def connected(self):
         """Connection status to your MongoDB."""
-        return hasattr(self, 'mongokit_db')
+        return self.mongokit_connection is not None
 
     def disconnect(self):
         """Close the connection to your MongoDB."""
         if self.connected:
             self.mongokit_connection.disconnect()
+            self.mongokit_connection = None
             del self.mongokit_db
 
     def before_request(self):
@@ -206,9 +208,6 @@ class MongoKit(object):
         return request
 
     def __getattr__(self, name, **kwargs):
-        if name == 'mongokit_db':
-            return self.mongokit_db
-        else:
-            if not self.connected:
-                self.connect()
-            return getattr(self.mongokit_db, name)
+        if not self.connected:
+            self.connect()
+        return getattr(self.mongokit_db, name)

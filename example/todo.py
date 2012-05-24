@@ -5,6 +5,7 @@ from flask.ext.mongokit import MongoKit, Document
 
 app = Flask(__name__)
 
+
 class Task(Document):
     __collection__ = 'tasks'
     structure = {
@@ -14,20 +15,23 @@ class Task(Document):
     }
     required_fields = ['title', 'creation']
     default_values = {'creation': datetime.utcnow()}
-    use_dot_notation = True 
-    
+    use_dot_notation = True
+
 db = MongoKit(app)
 db.register([Task])
+
 
 @app.route('/')
 def show_all():
     tasks = db.Task.find()
     return render_template('list.html', tasks=tasks)
 
+
 @app.route('/<ObjectId:task_id>')
 def show_task(task_id):
     task = db.Task.get_from_id(task_id)
     return render_template('task.html', task=task)
+
 
 @app.route('/new', methods=["GET", "POST"])
 def new_task():

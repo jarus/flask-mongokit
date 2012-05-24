@@ -26,8 +26,7 @@ setup(
     author_email='Christoph.Heer@googlemail.com',
     description='A Flask extension simplifies to use MongoKit',
     long_description=__doc__,
-    py_modules=['flaskext'],
-    namespace_packages=['flaskext'],
+    py_modules=['flask_mongokit'],
     zip_safe=False,
     platforms='any',
     install_requires=[

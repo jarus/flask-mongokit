@@ -1,7 +1,7 @@
 ==============
 Flask-MongoKit
 ==============
-.. currentmodule:: flask.ext.mongokit
+.. currentmodule:: flask_mongokit
 
 Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM 
 in Flask applications. If you find bugs or want to support this extension you can find the source code `here`_.

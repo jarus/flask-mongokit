@@ -36,6 +36,8 @@ Flask-MongoKit requires to run some packages (they will be installed automatical
 Changes
 -------
 
+* **0.5**: You don't need a request context anymore for the mongodb connection.
+
 * **0.4**: Support new import system of flask. Use now:
 
 ::

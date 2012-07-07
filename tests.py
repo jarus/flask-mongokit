@@ -200,14 +200,14 @@ class BaseTestCaseMultipleApps():
         self.app_1.config['MONGODB_DATABASE'] = 'app_1'
         
         self.app_2 = create_app('app_2')
-        self.app_1.config['MONGODB_DATABASE'] = 'app_2'
+        self.app_2.config['MONGODB_DATABASE'] = 'app_2'
         
         self.db = MongoKit()
         self.db.init_app(self.app_1)
         self.db.init_app(self.app_2)
 
     def tearDown(self):
-        pop_ctx()
+        self.pop_ctx()
 
     def push_ctx(self):
         raise NotImplementedError

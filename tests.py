@@ -26,8 +26,8 @@ class BlogPost(Document):
     default_values = {'rank': 0, 'date_creation': datetime.utcnow}
     use_dot_notation = True
 
-def create_app(name=__name__):
-    app = Flask(name)
+def create_app():
+    app = Flask(__name__)
     app.config['TESTING'] = True
     app.config['MONGODB_DATABASE'] = 'flask_testing'
     
@@ -196,11 +196,13 @@ class BaseTestCaseWithAuth():
 class BaseTestCaseMultipleApps():
 
     def setUp(self):
-        self.app_1 = create_app('app_1')
+        self.app_1 = create_app()
         self.app_1.config['MONGODB_DATABASE'] = 'app_1'
         
-        self.app_2 = create_app('app_2')
+        self.app_2 = create_app()
         self.app_2.config['MONGODB_DATABASE'] = 'app_2'
+        
+        assert self.app_1 != self.app_2
         
         self.db = MongoKit()
         self.db.init_app(self.app_1)
@@ -220,16 +222,16 @@ class BaseTestCaseMultipleApps():
         
         self.db.connect()
         assert self.db.connected
-        assert self.db.name == self.app_1.config['MONGODB_DATABASE']
-        assert self.db.name != self.app_2.config['MONGODB_DATABASE']
+        assert self.db.name == 'app_1'
+        assert self.db.name != 'app_2'
         
     def test_app_2(self):
         self.push_ctx(self.app_2)
         
         self.db.connect()
         assert self.db.connected
-        assert self.db.name != self.app_1.config['MONGODB_DATABASE']
-        assert self.db.name == self.app_2.config['MONGODB_DATABASE']
+        assert self.db.name != 'app_1'
+        assert self.db.name == 'app_2'
 
 class TestCaseInitAppWithRequestContext(BaseTestCaseInitAppWithContext, unittest.TestCase):
     def setUp(self):

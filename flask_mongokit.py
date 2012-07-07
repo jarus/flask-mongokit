@@ -14,9 +14,15 @@ from __future__ import absolute_import
 
 import bson
 from mongokit import Connection, Database, Collection, Document
-from flask import abort
+from flask import abort, _request_ctx_stack
 from werkzeug.routing import BaseConverter
 
+try:
+    from flask import _app_ctx_stack
+except ImportError:
+    _app_ctx_stack = None
+
+ctx_stack = _app_ctx_stack or _request_ctx_stack
 
 class BSONObjectIdConverter(BaseConverter):
     """A simple converter for the RESTfull URL routing system of Flask.
@@ -114,8 +120,6 @@ class MongoKit(object):
         app.config.setdefault('MONGODB_USERNAME', None)
         app.config.setdefault('MONGODB_PASSWORD', None)
 
-        app.before_request(self.before_request)
-
         # 0.9 and later
         if hasattr(app, 'teardown_appcontext'):
             app.teardown_appcontext(self.teardown_request)
@@ -126,9 +130,9 @@ class MongoKit(object):
         else:
             app.after_request(self.teardown_request)
 
-        # register extension with app
-        app.extensions = getattr(app, 'extensions', {})
-        app.extensions['mongokit'] = self
+        # # register extension with app
+        # app.extensions = getattr(app, 'extensions', {})
+        # app.extensions['mongokit'] = self
 
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
 
@@ -179,41 +183,55 @@ class MongoKit(object):
         ``MONGODB_PASSWORD`` then you will be authenticated at the
         ``MONGODB_DATABASE``.
         """
-        self.mongokit_connection = Connection(
-            host=self.app.config.get('MONGODB_HOST'),
-            port=self.app.config.get('MONGODB_PORT'),
-            slave_okay=self.app.config.get('MONGODB_SLAVE_OKAY')
-        )
-        self.mongokit_connection.register(self.registered_documents)
-        self.mongokit_db = Database(self.mongokit_connection,
-                                   self.app.config.get('MONGODB_DATABASE'))
-        if self.app.config.get('MONGODB_USERNAME') is not None:
-            self.mongokit_db.authenticate(
-                self.app.config.get('MONGODB_USERNAME'),
-                self.app.config.get('MONGODB_PASSWORD')
+        ctx = ctx_stack.top
+        mongokit_connection = getattr(ctx, 'mongokit_connection', None)
+        if mongokit_connection is None:
+            ctx.mongokit_connection = Connection(
+                host=ctx.app.config.get('MONGODB_HOST'),
+                port=ctx.app.config.get('MONGODB_PORT'),
+                slave_okay=ctx.app.config.get('MONGODB_SLAVE_OKAY')
+            )
+        
+            ctx.mongokit_connection.register(self.registered_documents)
+        
+        mongokit_database = getattr(ctx, 'mongokit_database', None)
+        if mongokit_database is None:
+            ctx.mongokit_database = Database(
+                ctx.mongokit_connection,
+                ctx.app.config.get('MONGODB_DATABASE')
+            )
+            
+        if ctx.app.config.get('MONGODB_USERNAME') is not None:
+            ctx.mongokit_db.authenticate(
+                ctx.app.config.get('MONGODB_USERNAME'),
+                ctx.app.config.get('MONGODB_PASSWORD')
             )
 
     @property
     def connected(self):
         """Connection status to your MongoDB."""
-        return self.mongokit_connection is not None
+        ctx = ctx_stack.top
+        return getattr(ctx, 'mongokit_connection', None) is not None
 
     def disconnect(self):
         """Close the connection to your MongoDB."""
         if self.connected:
-            self.mongokit_connection.disconnect()
-            self.mongokit_connection = None
-            del self.mongokit_db
+            ctx = ctx_stack.top
+            ctx.mongokit_connection.disconnect()
+            del ctx.mongokit_connection
+            del ctx.mongokit_database
 
     def before_request(self):
         if not self.connected:
             self.connect()
 
-    def teardown_request(self, request):
+    def teardown_request(self, response):
         self.disconnect()
-        return request
+        return response
 
     def __getattr__(self, name, **kwargs):
         if not self.connected:
             self.connect()
-        return getattr(self.mongokit_db, name)
+        
+        mongokit_database = getattr(ctx_stack.top, "mongokit_database")
+        return getattr(mongokit_database, name)

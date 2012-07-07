@@ -11,7 +11,6 @@ from flask_mongokit import MongoKit, BSONObjectIdConverter, \
 from werkzeug.exceptions import BadRequest, NotFound
 from bson import ObjectId
 
-
 class BlogPost(Document):
     __collection__ = "posts"
     structure = {
@@ -73,6 +72,9 @@ class TestCase(unittest.TestCase):
 
         self.db.disconnect()
         assert not self.db.connected
+        
+        self.db.collection_names()
+        assert self.db.connected
 
     def test_bson_object_id_converter(self):
         converter = BSONObjectIdConverter("/")

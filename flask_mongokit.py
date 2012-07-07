@@ -14,15 +14,15 @@ from __future__ import absolute_import
 
 import bson
 from mongokit import Connection, Database, Collection, Document
-from flask import abort, _request_ctx_stack
+
 from werkzeug.routing import BaseConverter
+from flask import abort, _request_ctx_stack
 
 try:
     from flask import _app_ctx_stack
+    ctx_stack = _app_ctx_stack
 except ImportError:
-    _app_ctx_stack = None
-
-ctx_stack = _app_ctx_stack or _request_ctx_stack
+    ctx_stack = _request_ctx_stack
 
 class BSONObjectIdConverter(BaseConverter):
     """A simple converter for the RESTfull URL routing system of Flask.
@@ -91,7 +91,6 @@ class MongoKit(object):
         #: :class:`list` of :class:`mongokit.Document`
         #: which will be automated registed at connection
         self.registered_documents = []
-        self.mongokit_connection = None
 
         if app is not None:
             self.app = app
@@ -100,12 +99,10 @@ class MongoKit(object):
             self.app = None
 
     def init_app(self, app):
-        """This method sets up some :meth:`~flask.Flask.before_request` and
-        :meth:`~flask.Flask.after_request` or
-        :meth:`~flask.Flask.teardown_request` handlers to support that
-        MongoKit opens a connection to your MongoDB host on a request and
-        closes after the response.
-
+        """This method connect your ``app`` with this extension. Flask-
+        MongoKit will now take care about to open and close the connection to 
+        your MongoDB.
+        
         Also it registers the
         :class:`flask.ext.mongokit.BSONObjectIdConverter`
         as a converter with the key word **ObjectId**.
@@ -122,13 +119,13 @@ class MongoKit(object):
 
         # 0.9 and later
         if hasattr(app, 'teardown_appcontext'):
-            app.teardown_appcontext(self.teardown_request)
+            app.teardown_appcontext(self._teardown_request)
         # 0.7 to 0.8
         elif hasattr(app, 'teardown_request'):
-            app.teardown_request(self.teardown_request)
+            app.teardown_request(self._teardown_request)
         # Older Flask versions
         else:
-            app.after_request(self.teardown_request)
+            app.after_request(self._teardown_request)
 
         # # register extension with app
         # app.extensions = getattr(app, 'extensions', {})
@@ -221,11 +218,7 @@ class MongoKit(object):
             del ctx.mongokit_connection
             del ctx.mongokit_database
 
-    def before_request(self):
-        if not self.connected:
-            self.connect()
-
-    def teardown_request(self, response):
+    def _teardown_request(self, response):
         self.disconnect()
         return response
 

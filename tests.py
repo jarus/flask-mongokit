@@ -26,8 +26,8 @@ class BlogPost(Document):
     default_values = {'rank': 0, 'date_creation': datetime.utcnow}
     use_dot_notation = True
 
-def create_app():
-    app = Flask(__name__)
+def create_app(name=__name__):
+    app = Flask(name)
     app.config['TESTING'] = True
     app.config['MONGODB_DATABASE'] = 'flask_testing'
     
@@ -193,6 +193,44 @@ class BaseTestCaseWithAuth():
         
         self.assertRaises(AuthenticationIncorrect, self.db.connect)
 
+class BaseTestCaseMultipleApps():
+
+    def setUp(self):
+        self.app_1 = create_app('app_1')
+        self.app_1.config['MONGODB_DATABASE'] = 'app_1'
+        
+        self.app_2 = create_app('app_2')
+        self.app_1.config['MONGODB_DATABASE'] = 'app_2'
+        
+        self.db = MongoKit()
+        self.db.init_app(self.app_1)
+        self.db.init_app(self.app_2)
+
+    def tearDown(self):
+        pop_ctx()
+
+    def push_ctx(self):
+        raise NotImplementedError
+    
+    def pop_ctx(self):
+        raise NotImplementedError
+
+    def test_app_1(self):
+        self.push_ctx(self.app_1)
+        
+        self.db.connect()
+        assert self.db.connected
+        assert self.db.name == self.app_1.config['MONGODB_DATABASE']
+        assert self.db.name != self.app_2.config['MONGODB_DATABASE']
+        
+    def test_app_2(self):
+        self.push_ctx(self.app_2)
+        
+        self.db.connect()
+        assert self.db.connected
+        assert self.db.name != self.app_1.config['MONGODB_DATABASE']
+        assert self.db.name == self.app_2.config['MONGODB_DATABASE']
+
 class TestCaseInitAppWithRequestContext(BaseTestCaseInitAppWithContext, unittest.TestCase):
     def setUp(self):
         self.app = create_app()
@@ -221,6 +259,14 @@ class TestCaseWithRequestContextAuth(BaseTestCaseWithAuth, unittest.TestCase):
         self.ctx = self.app.test_request_context('/')
         self.ctx.push()
     
+    def tearDown(self):
+        self.ctx.pop()
+
+class TestCaseMultipleAppsWithRequestContext(BaseTestCaseMultipleApps, unittest.TestCase):
+    def push_ctx(self, app):
+        self.ctx = app.test_request_context('/')
+        self.ctx.push()
+
     def tearDown(self):
         self.ctx.pop()
 
@@ -256,8 +302,14 @@ if hasattr(Flask, "app_context"):
     
         def tearDown(self):
             self.ctx.pop()
-
-
+    
+    class TestCaseMultipleAppsWithAppContext(BaseTestCaseMultipleApps, unittest.TestCase):
+        def push_ctx(self, app):
+            self.ctx = app.app_context()
+            self.ctx.push()
+         
+        def tearDown(self):
+            self.ctx.pop()
 
 def suite():
     suite = unittest.TestSuite()
@@ -265,10 +317,12 @@ def suite():
     suite.addTest(unittest.makeSuite(TestCaseInitAppWithRequestContext))
     suite.addTest(unittest.makeSuite(TestCaseWithRequestContext))
     suite.addTest(unittest.makeSuite(TestCaseWithRequestContextAuth))
+    suite.addTest(unittest.makeSuite(TestCaseMultipleAppsWithRequestContext))
     if hasattr(Flask, "app_context"):
         suite.addTest(unittest.makeSuite(TestCaseInitAppWithAppContext))
         suite.addTest(unittest.makeSuite(TestCaseWithAppContext))
         suite.addTest(unittest.makeSuite(TestCaseWithAppContextAuth))
+        suite.addTest(unittest.makeSuite(TestCaseMultipleAppsWithAppContext))
     return suite
     
 if __name__ == '__main__':

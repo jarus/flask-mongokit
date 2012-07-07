@@ -174,6 +174,7 @@ if hasattr(Flask, "app_context"):
 
 def suite():
     suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestCaseContextIndependent))
     suite.addTest(unittest.makeSuite(TestCaseWithRequestContext))
     if hasattr(Flask, "app_context"):
         suite.addTest(unittest.makeSuite(TestCaseWithAppContext))

@@ -18,11 +18,14 @@ from mongokit import Connection, Database, Collection, Document
 from werkzeug.routing import BaseConverter
 from flask import abort, _request_ctx_stack
 
-try:
+try: # pragma: no cover
     from flask import _app_ctx_stack
     ctx_stack = _app_ctx_stack
-except ImportError:
+except ImportError: # pragma: no cover
     ctx_stack = _request_ctx_stack
+
+class AuthenticationIncorrect(Exception):
+    pass
 
 class BSONObjectIdConverter(BaseConverter):
     """A simple converter for the RESTfull URL routing system of Flask.
@@ -118,18 +121,19 @@ class MongoKit(object):
         app.config.setdefault('MONGODB_PASSWORD', None)
 
         # 0.9 and later
-        if hasattr(app, 'teardown_appcontext'):
+        # no coverage check because there is everytime only one
+        if hasattr(app, 'teardown_appcontext'): # pragma: no cover
             app.teardown_appcontext(self._teardown_request)
         # 0.7 to 0.8
-        elif hasattr(app, 'teardown_request'):
+        elif hasattr(app, 'teardown_request'): # pragma: no cover
             app.teardown_request(self._teardown_request)
         # Older Flask versions
-        else:
+        else: # pragma: no cover
             app.after_request(self._teardown_request)
 
-        # # register extension with app
-        # app.extensions = getattr(app, 'extensions', {})
-        # app.extensions['mongokit'] = self
+        # register extension with app only to say "I'm here"
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['mongokit'] = self
 
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
 
@@ -180,6 +184,11 @@ class MongoKit(object):
         ``MONGODB_PASSWORD`` then you will be authenticated at the
         ``MONGODB_DATABASE``.
         """
+        if self.app is None:
+            raise RuntimeError('The flask-mongokit extension was not init to '
+                               'the current application.  Please make sure '
+                               'to call init_app() first.')
+
         ctx = ctx_stack.top
         mongokit_connection = getattr(ctx, 'mongokit_connection', None)
         if mongokit_connection is None:
@@ -199,10 +208,12 @@ class MongoKit(object):
             )
             
         if ctx.app.config.get('MONGODB_USERNAME') is not None:
-            ctx.mongokit_db.authenticate(
+            auth_success = ctx.mongokit_database.authenticate(
                 ctx.app.config.get('MONGODB_USERNAME'),
                 ctx.app.config.get('MONGODB_PASSWORD')
             )
+            if not auth_success:
+                raise AuthenticationIncorrect
 
     @property
     def connected(self):

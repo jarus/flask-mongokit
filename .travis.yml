@@ -10,6 +10,7 @@ env:
   - FLASK=0.6
   - FLASK=0.5
 install:
+  - pip install coverage --use-mirrors
   - pip install flask==$FLASK --use-mirrors
   - pip install -e . --use-mirrors
 script:

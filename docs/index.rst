@@ -118,6 +118,55 @@ The following configuration variables are used in Flask-MongoKit:
                                 *Default value:* ``None``
 =============================== =========================================
 
+.. _request-app-context:
+
+Request and App context
+-----------------------
+
+If you want to make some operations on your MongoDB with Flask-MongoKit you need a context like the request or app context. If you want to use it for example in Flask-Script than the best choise is the app context (implemented since Flask v0.9). There is a small example how to use the app context.::
+
+    from flask import Flask
+    from flask.ext.mongokit import MongoKit
+    
+    app = Flask(__name__)
+    db = MongoKit(app)
+    
+    with app.app_context():
+        db['my_collection'].insert({'x': 5})
+        print db['my_collection'].find_one({'x': 5})
+
+You can also use it in the normal request context like insite of a view function or in the test request context like the following example.::
+
+    with app.test_request_context('/'):
+        db['my_collection'].insert({'x': 5})
+        print db['my_collection'].find_one({'x': 5})
+
+Changelog
+=========
+
+* **0.6 (08.07.2012)**
+
+  * Use the new app context and again the old request context, 
+    see :ref:`request-app-context`.
+  * The MongoKit object is now subscriptable and support the typical syntax to 
+    get a collection.::
+
+        db['my_collection'].insert({'x': 5})
+  
+  * Restructured and improved test suite.
+  * Sounds crazy but improved python2.5 support.
+
+* **0.5 (02.07.2012)**
+
+  * You don't need a request context anymore for the mongodb connection.
+    (A bad decision ... look in 0.6)
+
+* **0.4 (23.02.2012)**
+
+  * Support new import system of flask. Use now::
+  
+      form flask.ext.mongokit import Mongokit
+    
     
 API Documentation
 =================

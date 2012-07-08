@@ -11,6 +11,7 @@ from flask_mongokit import MongoKit, BSONObjectIdConverter, \
 from werkzeug.exceptions import BadRequest, NotFound
 from bson import ObjectId
 from pymongo import Connection
+from pymongo.collection import Collection
 
 class BlogPost(Document):
     __collection__ = "posts"
@@ -100,6 +101,10 @@ class BaseTestCaseWithContext():
         
         self.db.collection_names()
         assert self.db.connected
+    
+    def test_subscriptable(self):
+        assert isinstance(self.db['test'], Collection)
+        assert self.db['test'] == self.db.test
 
     def test_save_and_find_document(self):
         self.db.register([BlogPost])

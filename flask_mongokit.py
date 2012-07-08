@@ -239,3 +239,10 @@ class MongoKit(object):
         
         mongokit_database = getattr(ctx_stack.top, "mongokit_database")
         return getattr(mongokit_database, name)
+    
+    def __getitem__(self, name):
+        if not self.connected:
+            self.connect()
+        
+        mongokit_database = getattr(ctx_stack.top, "mongokit_database")
+        return mongokit_database[name]

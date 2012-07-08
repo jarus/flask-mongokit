@@ -33,13 +33,27 @@ Flask-MongoKit requires to run some packages (they will be installed automatical
 * MongoKit
 * pymongo
 
-Changes
--------
+Changelog
+=========
 
-* **0.5**: You don't need a request context anymore for the mongodb connection.
+* **0.6 (08.07.2012)**
 
-* **0.4**: Support new import system of flask. Use now:
+  * Use the new app context and again the old request context.
+  * The MongoKit object is now subscriptable and support the typical syntax to 
+    get a collection.::
 
-::
-   
-   form flask.ext.mongokit import Mongokit
+        db['my_collection'].insert({'x': 5})
+
+  * Restructured and improved test suite.
+  * Sounds crazy but improved python2.5 support.
+
+* **0.5 (02.07.2012)**
+
+  * You don't need a request context anymore for the mongodb connection.
+    (A bad decision ... look in 0.6)
+
+* **0.4 (23.02.2012)**
+
+  * Support new import system of flask. Use now::
+
+      form flask.ext.mongokit import Mongokit

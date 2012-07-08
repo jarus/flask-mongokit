@@ -19,7 +19,7 @@ from setuptools import setup
 
 setup(
     name='Flask-MongoKit',
-    version='0.5',
+    version='0.6',
     url='http://github.com/jarus/flask-mongokit',
     license='BSD',
     author='Christoph Heer',

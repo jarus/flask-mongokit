@@ -213,7 +213,7 @@ class MongoKit(object):
                 ctx.app.config.get('MONGODB_PASSWORD')
             )
             if not auth_success:
-                raise AuthenticationIncorrect
+                raise AuthenticationIncorrect('Server authentication failed')
 
     @property
     def connected(self):

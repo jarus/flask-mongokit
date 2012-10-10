@@ -56,4 +56,4 @@ Changelog
 
   * Support new import system of flask. Use now::
 
-      form flask.ext.mongokit import Mongokit
+      from flask.ext.mongokit import Mongokit

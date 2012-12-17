@@ -3,12 +3,12 @@ Flask-MongoKit
 ==============
 .. currentmodule:: flask_mongokit
 
-Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM 
+Flask-MongoKit simplifies to use `MongoKit`_, a powerful `MongoDB`_ ORM
 in Flask applications. If you find bugs or want to support this extension you can find the source code `here`_.
 
 .. _MongoKit: http://namlook.github.com/mongokit/
 .. _MongoDB: http://www.mongodb.org/
-.. _here: http://bitbucket.org/Jarus/flask-mongokit/
+.. _here: https://github.com/jarus/flask-mongokit/
 
 Installation
 ============
@@ -54,7 +54,7 @@ It is very simple to use MongoKit in your Flask application. Let's create a simp
         }
         required_fields = ['title', 'creation']
         default_values = {'creation': datetime.utcnow}
-        use_dot_notation = True 
+        use_dot_notation = True
 
     db = MongoKit(app)
     db.register([Task])
@@ -64,7 +64,7 @@ As you can see we create a document model as class *Task* which uses Document fr
 Now we need a view to add a new task like this.
 
 .. code-block:: python
-    
+
     @app.route('/new', methods=["GET", "POST"])
     def new_task():
         if request.method == 'POST':
@@ -101,7 +101,7 @@ The following configuration variables are used in Flask-MongoKit:
 
 =============================== =========================================
 ``MONGODB_DATABASE``            The database name that should used.
-                                
+
                                 *Default value:* ``flask``
 ``MONGODB_HOST``                Hostname or IP address of the MongoDB host.
 
@@ -109,7 +109,7 @@ The following configuration variables are used in Flask-MongoKit:
 ``MONGODB_PORT``                Listening port of the MongoDB host.
 
                                 *Default value:* ``27017``
-``MONGODB_USERNAME``            If you need authentication than you can set             
+``MONGODB_USERNAME``            If you need authentication than you can set
                                 there your username.
 
                                 *Default value:* ``None``
@@ -127,10 +127,10 @@ If you want to make some operations on your MongoDB with Flask-MongoKit you need
 
     from flask import Flask
     from flask.ext.mongokit import MongoKit
-    
+
     app = Flask(__name__)
     db = MongoKit(app)
-    
+
     with app.app_context():
         db['my_collection'].insert({'x': 5})
         print db['my_collection'].find_one({'x': 5})
@@ -146,13 +146,13 @@ Changelog
 
 * **0.6 (08.07.2012)**
 
-  * Use the new app context and again the old request context, 
+  * Use the new app context and again the old request context,
     see :ref:`request-app-context`.
-  * The MongoKit object is now subscriptable and support the typical syntax to 
+  * The MongoKit object is now subscriptable and support the typical syntax to
     get a collection.::
 
         db['my_collection'].insert({'x': 5})
-  
+
   * Restructured and improved test suite.
   * Sounds crazy but improved python2.5 support.
 
@@ -164,10 +164,10 @@ Changelog
 * **0.4 (23.02.2012)**
 
   * Support new import system of flask. Use now::
-  
+
       form flask.ext.mongokit import Mongokit
-    
-    
+
+
 API Documentation
 =================
 

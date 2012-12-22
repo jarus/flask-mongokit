@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 try:
@@ -6,17 +7,20 @@ try:
 except ImportError:
     coverage_available = False
 
+
 def run():
     if coverage_available:
         cov = coverage(source=['flask_mongokit'])
         cov.start()
-    
+
     from tests import suite
-    unittest.TextTestRunner(verbosity=2).run(suite())
-    
+    result = unittest.TextTestRunner(verbosity=2).run(suite())
+    if not result.wasSuccessful():
+        sys.exit(1)
+
     if coverage_available:
         cov.stop()
-        
+
         print "\nCode Coverage"
         cov.report()
         cov.html_report(directory='cover')

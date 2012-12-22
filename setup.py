@@ -2,7 +2,7 @@
 Flask-MongoKit
 --------------
 
-Flask-MongoKit simplifies to use MongoKit, a powerful MongoDB ORM in Flask      
+Flask-MongoKit simplifies to use MongoKit, a powerful MongoDB ORM in Flask
 applications.
 
 Links
@@ -14,8 +14,16 @@ Links
 * `Flask <http://flask.pocoo.org>`_
 
 """
+import sys
 from setuptools import setup
 
+install_requires = [
+    "Flask",
+    "MongoKit"
+]
+
+if sys.version_info < (2, 6):
+    install_requires.append('simplejson')
 
 setup(
     name='Flask-MongoKit',
@@ -29,10 +37,7 @@ setup(
     py_modules=['flask_mongokit'],
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Flask',
-        'MongoKit'
-    ],
+    install_requires=install_requires,
     test_suite='tests.suite',
     classifiers=[
         'Development Status :: 4 - Beta',

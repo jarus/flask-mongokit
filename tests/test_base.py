@@ -31,11 +31,11 @@ def create_app():
     app = Flask(__name__)
     app.config['TESTING'] = True
     app.config['MONGODB_DATABASE'] = 'flask_testing'
-    
+
     maybe_conf_file = os.path.join(os.getcwd(), "config_test.cfg")
     if os.path.exists(maybe_conf_file):
         app.config.from_pyfile(maybe_conf_file)
-    
+
     return app
 
 class TestCaseContextIndependent(unittest.TestCase):
@@ -45,16 +45,16 @@ class TestCaseContextIndependent(unittest.TestCase):
 
     def tearDown(self):
         pass
-    
+
     def test_register_document(self):
         self.db.register([BlogPost])
-        
+
         assert len(self.db.registered_documents) > 0
         assert self.db.registered_documents[0] == BlogPost
-    
+
     def test_bson_object_id_converter(self):
         converter = BSONObjectIdConverter("/")
-    
+
         self.assertRaises(BadRequest, converter.to_python, ("132"))
         assert converter.to_python("4e4ac5cfffc84958fa1f45fb") == \
                ObjectId("4e4ac5cfffc84958fa1f45fb")
@@ -72,6 +72,7 @@ class BaseTestCaseInitAppWithContext():
 
     def test_init_later(self):
         self.db = MongoKit()
+        print self.db.app
         self.assertRaises(RuntimeError, self.db.connect)
 
         self.db.init_app(self.app)
@@ -98,10 +99,10 @@ class BaseTestCaseWithContext():
 
         self.db.disconnect()
         assert not self.db.connected
-        
+
         self.db.collection_names()
         assert self.db.connected
-    
+
     def test_subscriptable(self):
         assert isinstance(self.db['test'], Collection)
         assert self.db['test'] == self.db.test
@@ -170,23 +171,23 @@ class BaseTestCaseWithAuth():
         db = 'flask_testing_auth'
         conn = Connection()
         conn[db].add_user('test', 'test')
-        
+
         self.app = create_app()
         self.app.config['TESTING'] = True
         self.app.config['MONGODB_DATABASE'] = db
-        
+
         self.db = MongoKit(self.app)
 
     def test_correct_login(self):
         self.app.config['MONGODB_USERNAME'] = 'test'
         self.app.config['MONGODB_PASSWORD'] = 'test'
-        
+
         self.db.connect()
-    
+
     def test_incorrect_login(self):
         self.app.config['MONGODB_USERNAME'] = 'fuu'
         self.app.config['MONGODB_PASSWORD'] = 'baa'
-        
+
         self.assertRaises(AuthenticationIncorrect, self.db.connect)
 
 class BaseTestCaseMultipleApps():
@@ -194,48 +195,55 @@ class BaseTestCaseMultipleApps():
     def setUp(self):
         self.app_1 = create_app()
         self.app_1.config['MONGODB_DATABASE'] = 'app_1'
-        
+
         self.app_2 = create_app()
         self.app_2.config['MONGODB_DATABASE'] = 'app_2'
-        
+
+        self.app_3 = create_app()
+        self.app_3.config['MONGODB_DATABASE'] = 'app_3'
+
         assert self.app_1 != self.app_2
-        
-        self.db = MongoKit()
-        self.db.init_app(self.app_1)
-        self.db.init_app(self.app_2)
+        assert self.app_2 != self.app_3
+        assert self.app_3 != self.app_1
+
+        self.db = MongoKit(self.app_3)
 
     def tearDown(self):
         self.pop_ctx()
 
     def push_ctx(self):
         raise NotImplementedError
-    
+
     def pop_ctx(self):
         raise NotImplementedError
 
     def test_app_1(self):
         self.push_ctx(self.app_1)
-        
+
         self.db.connect()
         assert self.db.connected
-        assert self.db.name == 'app_1'
-        assert self.db.name != 'app_2'
-        
+        assert self.db.name == "app_1"
+
     def test_app_2(self):
         self.push_ctx(self.app_2)
-        
+
         self.db.connect()
         assert self.db.connected
-        assert self.db.name != 'app_1'
-        assert self.db.name == 'app_2'
+        assert self.db.name == "app_2"
+
+    def test_fallback_app(self):
+        self.db.connect()
+        assert self.db.connected
+        print self.db.name
+        assert self.db.name == "app_3"
 
 class TestCaseInitAppWithRequestContext(BaseTestCaseInitAppWithContext, unittest.TestCase):
     def setUp(self):
         self.app = create_app()
-        
+
         self.ctx = self.app.test_request_context('/')
         self.ctx.push()
-        
+
     def tearDown(self):
         self.ctx.pop()
 
@@ -243,20 +251,20 @@ class TestCaseWithRequestContext(BaseTestCaseWithContext, unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.db = MongoKit(self.app)
-    
+
         self.ctx = self.app.test_request_context('/')
         self.ctx.push()
-    
+
     def tearDown(self):
         self.ctx.pop()
 
 class TestCaseWithRequestContextAuth(BaseTestCaseWithAuth, unittest.TestCase):
     def setUp(self):
         super(TestCaseWithRequestContextAuth, self).setUp()
-        
+
         self.ctx = self.app.test_request_context('/')
         self.ctx.push()
-    
+
     def tearDown(self):
         self.ctx.pop()
 
@@ -265,49 +273,51 @@ class TestCaseMultipleAppsWithRequestContext(BaseTestCaseMultipleApps, unittest.
         self.ctx = app.test_request_context('/')
         self.ctx.push()
 
-    def tearDown(self):
-        self.ctx.pop()
+    def pop_ctx(self):
+        if hasattr(self, 'ctx'):
+            self.ctx.pop()
 
 # Only testing is the flask version support app context (since flask v0.9)
 if hasattr(Flask, "app_context"):
     class TestCaseInitAppWithAppContext(BaseTestCaseInitAppWithContext, unittest.TestCase):
         def setUp(self):
             self.app = create_app()
-    
+
             self.ctx = self.app.app_context()
             self.ctx.push()
-    
+
         def tearDown(self):
             self.ctx.pop()
-    
+
     class TestCaseWithAppContext(BaseTestCaseWithContext, unittest.TestCase):
         def setUp(self):
             self.app = create_app()
             self.db = MongoKit(self.app)
-            
+
             self.ctx = self.app.app_context()
             self.ctx.push()
-        
+
         def tearDown(self):
             self.ctx.pop()
-    
+
     class TestCaseWithAppContextAuth(BaseTestCaseWithAuth, unittest.TestCase):
         def setUp(self):
             super(TestCaseWithAppContextAuth, self).setUp()
-    
+
             self.ctx = self.app.app_context()
             self.ctx.push()
-    
+
         def tearDown(self):
             self.ctx.pop()
-    
+
     class TestCaseMultipleAppsWithAppContext(BaseTestCaseMultipleApps, unittest.TestCase):
         def push_ctx(self, app):
             self.ctx = app.app_context()
             self.ctx.push()
-         
-        def tearDown(self):
-            self.ctx.pop()
+
+        def pop_ctx(self):
+            if hasattr(self, 'ctx'):
+                self.ctx.pop()
 
 if __name__ == '__main__':
     unittest.main()

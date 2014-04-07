@@ -116,6 +116,11 @@ The following configuration variables are used in Flask-MongoKit:
 ``MONGODB_PASSWORD``            Password for authentication.
 
                                 *Default value:* ``None``
+``MONGODB_TZ_AWARE``            It sets the tz_aware parameter to True when
+                                creating a connection. The timezone of datetime
+                                objects returned from MongoDB will always be UTC.
+
+                                *Default value:* ``False``
 =============================== =========================================
 
 .. _request-app-context:

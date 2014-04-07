@@ -183,7 +183,8 @@ class MongoKit(object):
         """Connect to the MongoDB server and register the documents from
         :attr:`registered_documents`. If you set ``MONGODB_USERNAME`` and
         ``MONGODB_PASSWORD`` then you will be authenticated at the
-        ``MONGODB_DATABASE``.
+        ``MONGODB_DATABASE``. You can also enable timezone awareness if
+        you set to True ``MONGODB_TZ_AWARE`.
         """
         if self.app is None:
             raise RuntimeError('The flask-mongokit extension was not init to '
@@ -196,7 +197,8 @@ class MongoKit(object):
             ctx.mongokit_connection = Connection(
                 host=ctx.app.config.get('MONGODB_HOST'),
                 port=ctx.app.config.get('MONGODB_PORT'),
-                slave_okay=ctx.app.config.get('MONGODB_SLAVE_OKAY')
+                slave_okay=ctx.app.config.get('MONGODB_SLAVE_OKAY'),
+                tz_aware=ctx.app.config.get('MONGODB_TZ_AWARE', False)
             )
 
             ctx.mongokit_connection.register(self.registered_documents)

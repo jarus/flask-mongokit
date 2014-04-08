@@ -14,6 +14,7 @@ from __future__ import absolute_import
 
 import bson
 from mongokit import Connection, Database, Collection, Document
+from pymongo.errors import OperationFailure
 
 from werkzeug.routing import BaseConverter
 from flask import abort, _request_ctx_stack
@@ -103,9 +104,9 @@ class MongoKit(object):
 
     def init_app(self, app):
         """This method connect your ``app`` with this extension. Flask-
-        MongoKit will now take care about to open and close the connection to 
+        MongoKit will now take care about to open and close the connection to
         your MongoDB.
-        
+
         Also it registers the
         :class:`flask.ext.mongokit.BSONObjectIdConverter`
         as a converter with the key word **ObjectId**.
@@ -197,21 +198,25 @@ class MongoKit(object):
                 port=ctx.app.config.get('MONGODB_PORT'),
                 slave_okay=ctx.app.config.get('MONGODB_SLAVE_OKAY')
             )
-        
+
             ctx.mongokit_connection.register(self.registered_documents)
-        
+
         mongokit_database = getattr(ctx, 'mongokit_database', None)
         if mongokit_database is None:
             ctx.mongokit_database = Database(
                 ctx.mongokit_connection,
                 ctx.app.config.get('MONGODB_DATABASE')
             )
-            
+
         if ctx.app.config.get('MONGODB_USERNAME') is not None:
-            auth_success = ctx.mongokit_database.authenticate(
-                ctx.app.config.get('MONGODB_USERNAME'),
-                ctx.app.config.get('MONGODB_PASSWORD')
-            )
+            try:
+                auth_success = ctx.mongokit_database.authenticate(
+                    ctx.app.config.get('MONGODB_USERNAME'),
+                    ctx.app.config.get('MONGODB_PASSWORD')
+                )
+            except OperationFailure:
+                auth_success = False
+
             if not auth_success:
                 raise AuthenticationIncorrect('Server authentication failed')
 
@@ -236,13 +241,13 @@ class MongoKit(object):
     def __getattr__(self, name, **kwargs):
         if not self.connected:
             self.connect()
-        
+
         mongokit_database = getattr(ctx_stack.top, "mongokit_database")
         return getattr(mongokit_database, name)
-    
+
     def __getitem__(self, name):
         if not self.connected:
             self.connect()
-        
+
         mongokit_database = getattr(ctx_stack.top, "mongokit_database")
         return mongokit_database[name]

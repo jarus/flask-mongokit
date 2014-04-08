@@ -7,3 +7,6 @@ dist
 *.egg
 *.egg-info
 _build
+
+Vagrantfile
+.vagrant/
